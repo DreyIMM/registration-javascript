@@ -9,9 +9,5 @@ class User{
         this.password = password;
         this.photo = photo;
         this.admin = admin
-    }
-
-
-
-    
+    }    
 }
