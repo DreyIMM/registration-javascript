@@ -1,98 +1,83 @@
-class UserController{
-
-    constructor(formId, tableId){
+class UserController {
+    constructor(formId, tableId) {
         this.formEl = document.getElementById(formId);
         this.tableEl = document.getElementById(tableId);
         this.onSubmit();
-    
     }
 
-    onSubmit(){
-              
-        this.formEl.addEventListener("submit", event=>{
-     
-             //cancela o comportamento padrão do submit, que é o envio. 
+    onSubmit() {
+        this.formEl.addEventListener("submit", (event) => {
+            //cancela o comportamento padrão do submit, que é o envio.
             event.preventDefault();
-            
+
             let values = this.getValues();
-            
+
+            let btn = this.formEl.querySelector("[type=submit]")
+
+            btn.disabled = true;
+
             this.getPhoto().then(
-                (content)=>{
+                (content) => {
                     values.photo = content;
-                    this.addLine(values)
-                
-            },
-            (e)=>{
-                console.log(e);
-            }        
+                    this.addLine(values);
+                    this.formEl.reset();
+                    btn.disabled = false; 
+                },
+                (e) => {
+                    console.log(e);
+                }
             );
+        });
+    }
 
-                              
-         });
-     }
-
-     //Metodo para Lê o caminho da foto 
-     getPhoto(){
-         return new Promise ((resolve, reject)=>    {
+    //Metodo para Lê o caminho da foto
+    getPhoto() {
+        return new Promise((resolve, reject) => {
             let fileReader = new FileReader();
 
-            let elements = [...this.formEl.elements].filter(item=>{
-   
-                if(item.name === 'photo'){
+            let elements = [...this.formEl.elements].filter((item) => {
+                if (item.name === "photo") {
                     return item;
-                    
                 }
-   
             });
-   
+
             let file = elements[0].files[0];
-           
-            fileReader.onload = ()=>{
-                           
-               resolve(fileReader.result);
-   
+
+            fileReader.onload = () => {
+                resolve(fileReader.result);
             };
-            FileReader.onerror = (e)=>{
+            FileReader.onerror = (e) => {
                 reject(e);
-            }
+            };
 
-            if(file){
+            if (file) {
                 fileReader.readAsDataURL(file);
-            }else{
-                resolve();
+            } else {
+                resolve("dist/img/boxed-bg.jpg");
             }
-            
-         });
-
-     }
-
-
+        });
+    }
 
     // Criando um metodo que percorre todo o formulario, pegamos dados do campos e cria um JSOn
-    getValues(){
+    getValues() {
         //o let user faz essa variavel existir somente aqui
-        let user = {}; 
+        let user = {};
         console.log(typeof this.formEl.elements);
-        [...this.formEl.elements].forEach(function(field, index){
-
-            if(field.name == "gender"){
-               
-                if(field.checked) {
-        
-                    user[field.name] = field.value ;
-                
+        [...this.formEl.elements].forEach(function (field, index) {
+            if (field.name == "gender") {
+                if (field.checked) {
+                    user[field.name] = field.value;
                 }
-                  
-            }else{
-                
-                user[field.name] = field.value ;
+            } else if (field.name == "admin") {
+                user[field.name] = field.checked;
+            } else {
+                user[field.name] = field.value;
                 //user[name] = o valor do field
             }
-        
         });
-        
-        return  new User(
-            user.name, 
+
+        return new User(
+            user.name,
             user.gender,
             user.birth,
             user.country,
@@ -103,24 +88,23 @@ class UserController{
         );
     }
 
-   
     //Cria uma função que adiciona uma linha na tabela
-    addLine(dataUser){
-           
-        this.tableEl.innerHTML = `
+    addLine(dataUser) {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
         
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
-            <td>${dataUser.admin}</td>
-            <td>${dataUser.birth}</td>
+            <td>${(dataUser.admin) ? 'Sim' : 'Não'}</td>
+            <td>${Utils.dateFormat(dataUser.register)}</td>
             <td>
             <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
             <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
             </td>      
         
-        `    
+        `;
+
+        this.tableEl.appendChild(tr);
     }
-
-
 }
