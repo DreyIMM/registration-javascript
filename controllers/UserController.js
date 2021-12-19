@@ -22,9 +22,9 @@ class UserController{
                     this.addLine(values)
                 
             },
-                function(e){
-                    console.log(e);
-                }
+            (e)=>{
+                console.log(e);
+            }        
             );
 
                               
@@ -56,8 +56,12 @@ class UserController{
                 reject(e);
             }
 
-   
-            fileReader.readAsDataURL(file);
+            if(file){
+                fileReader.readAsDataURL(file);
+            }else{
+                resolve();
+            }
+            
          });
 
      }
