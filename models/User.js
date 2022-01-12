@@ -76,12 +76,12 @@ class User{
         this._photo =  photo;
     }
 
-    get admi(){
+    get admin(){
         return this._admin;
     }
 
-    set admi(admi){
-        this._admin =  admi;
+    set admin(admin){
+        this._admin =  admin;
     }
 
 
