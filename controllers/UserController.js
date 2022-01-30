@@ -187,7 +187,7 @@ class UserController {
             <td>${Utils.dateFormat(dataUser.register)}</td> 
             <td>
                 <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
             </td>      
         
         `;
@@ -200,6 +200,17 @@ class UserController {
   }
 
   addEventsTr(tr) {
+    tr.querySelector(".btn-delete").addEventListener("click", e=>{
+
+        if(confirm("Deseja realmente excluir ?")){
+
+            tr.remove();
+            this.updateCount();
+        }
+
+    });
+
+
     tr.querySelector(".btn-edit").addEventListener("click", (e) => {
       //Interpreta uma string JSON.Parse converte em Objeto JSON.
       let json = JSON.parse(tr.dataset.user);
@@ -251,13 +262,18 @@ class UserController {
     document.querySelector("#number-users").innerHTML = numberUsers;
     document.querySelector("#number-users-admin").innerHTML = numberAdmin;
   }
+
   showPanelUpdate() {
     document.querySelector("#box-user-update").style.display = "block";
     document.querySelector("#box-user-create").style.display = "none";
   }
 
+
   showPanelCreate() {
     document.querySelector("#box-user-update").style.display = "none";
     document.querySelector("#box-user-create").style.display = "block";
   }
+
+
+  
 }
