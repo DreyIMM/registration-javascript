@@ -48,6 +48,8 @@ class UserController {
           let user = new User();
           user.loadFromJSON(result);
           
+          user.save();
+
           this.getTr(user, tr);
                    
           this.formEUpdateEl.reset();
@@ -77,7 +79,7 @@ class UserController {
       this.getPhoto(this.formEl).then(
         (content) => {
           values.photo = content;
-          this.insert(values);
+          values.save();
           this.addLine(values);
           this.formEl.reset();
           btn.disabled = false;
@@ -184,14 +186,14 @@ class UserController {
     });
   }
 
-  //Criando uma função que salva na SessionStorage
-  insert(data) {
-    let users = this.getUsersStorage();
+  //Criando uma função que salva na SessionStorage (meotod save faz isso)
+  // insert(data) {
+  //   let users = this.getUsersStorage();
 
-    users.push(data);
+  //   users.push(data);
 
-    localStorage.setItem("users", JSON.stringify(users));
-  }
+  //   localStorage.setItem("users", JSON.stringify(users));
+  // }
 
   //Cria uma função que adiciona uma linha na tabela
   addLine(dataUser) {
