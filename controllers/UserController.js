@@ -33,7 +33,7 @@ class UserController {
 
       let result = Object.assign({}, userOld, values);
 
-      tr.dataset.user = JSON.stringify(result);
+      
 
       this.showPanelCreate();
 
@@ -45,23 +45,11 @@ class UserController {
             result._photo = content;
           }
 
-          tr.innerHTML = `        
-                    <td><img src="${
-                      result._photo
-                    }" alt="User Image" class="img-circle img-sm"></td>
-                    <td>${result._name}</td>
-                    <td>${result._email}</td>
-                    <td>${result._admin ? "Sim" : "Não"}</td>          
-                    <td>${Utils.dateFormat(result._register)}</td> 
-                    <td>
-                        <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                        <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-                    </td>      
-                
-                `;
-
-          this.addEventsTr(tr);
-
+          let user = new User();
+          user.loadFromJSON(result);
+          
+          this.getTr(user, tr);
+                   
           this.formEUpdateEl.reset();
 
           this.updateCount();
@@ -173,94 +161,79 @@ class UserController {
     );
   }
 
-  getUsersStorage(){
+  getUsersStorage() {
+    let users = [];
 
-    let users = [] ;
-
-    if(sessionStorage.getItem("users")){
-
-        users = JSON.parse(sessionStorage.getItem("users"));
+    if (localStorage.getItem("users")) {
+      users = JSON.parse(localStorage.getItem("users"));
     }
 
-    return users
-
+    return users;
   }
-
 
   //Listando todos os dados que tem na SessionStorage
-  selectAll(){
-      
-    let users = this.getUsersStorage()
+  selectAll() {
+    let users = this.getUsersStorage();
 
-    users.forEach(dataUser=>{
+    users.forEach((dataUser) => {
+      let user = new User();
 
-        let user = new User();
+      user.loadFromJSON(dataUser);
 
-        user.loadFromJSON(dataUser);
-
-        this.addLine(user);
-
-    })
-
+      this.addLine(user);
+    });
   }
-
 
   //Criando uma função que salva na SessionStorage
-  insert(data){
-   
-    let users = this.getUsersStorage()
+  insert(data) {
+    let users = this.getUsersStorage();
 
     users.push(data);
-          
-    
-    sessionStorage.setItem("users", JSON.stringify(users));
 
+    localStorage.setItem("users", JSON.stringify(users));
   }
-
-
 
   //Cria uma função que adiciona uma linha na tabela
   addLine(dataUser) {
-    
-    let tr = document.createElement("tr");   
-
-
-    tr.dataset.user = JSON.stringify(dataUser);
-
-    tr.innerHTML = `
-        
-            <td><img src="${
-              dataUser.photo
-            }" alt="User Image" class="img-circle img-sm"></td>
-            <td>${dataUser.name}</td>
-            <td>${dataUser.email}</td>
-            <td>${dataUser.admin ? "Sim" : "Não"}</td>          
-            <td>${Utils.dateFormat(dataUser.register)}</td> 
-            <td>
-                <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
-            </td>      
-        
-        `;
-
-    this.addEventsTr(tr);
+    let tr = this.getTr(dataUser);
 
     this.tableEl.appendChild(tr);
 
     this.updateCount();
   }
 
+  //Seleciona qual TR será gerado
+  getTr(dataUser, tr = null) {
+    if (tr === null) tr = document.createElement("tr");
+
+    tr.dataset.user = JSON.stringify(dataUser);
+
+    tr.innerHTML = `        
+        <td><img src="${
+          dataUser.photo
+        }" alt="User Image" class="img-circle img-sm"></td>
+        <td>${dataUser.name}</td>
+        <td>${dataUser.email}</td>
+        <td>${dataUser.admin ? "Sim" : "Não"}</td>          
+        <td>${Utils.dateFormat(dataUser.register)}</td> 
+        <td>
+            <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
+            <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
+        </td>      
+
+    `;
+    this.addEventsTr(tr);
+
+    return tr;
+  }
+
   addEventsTr(tr) {
-    tr.querySelector(".btn-delete").addEventListener("click", e=>{
-
-        if(confirm("Deseja realmente excluir ?")){
-
-            tr.remove();
-            this.updateCount();
-        }
-
+    tr.querySelector(".btn-delete").addEventListener("click", (e) => {
+      if (confirm("Deseja realmente excluir ?")) {
+        tr.remove();
+        this.updateCount();
+      }
     });
-
 
     tr.querySelector(".btn-edit").addEventListener("click", (e) => {
       //Interpreta uma string JSON.Parse converte em Objeto JSON.
@@ -319,12 +292,8 @@ class UserController {
     document.querySelector("#box-user-create").style.display = "none";
   }
 
-
   showPanelCreate() {
     document.querySelector("#box-user-update").style.display = "none";
     document.querySelector("#box-user-create").style.display = "block";
   }
-
-
-
 }
