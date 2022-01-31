@@ -5,6 +5,8 @@ class UserController {
     this.tableEl = document.getElementById(tableId);
     this.onSubmit();
     this.onEdit();
+
+    this.selectAll();
   }
 
   onEdit() {
@@ -87,6 +89,7 @@ class UserController {
       this.getPhoto(this.formEl).then(
         (content) => {
           values.photo = content;
+          this.insert(values);
           this.addLine(values);
           this.formEl.reset();
           btn.disabled = false;
@@ -170,9 +173,57 @@ class UserController {
     );
   }
 
+  getUsersStorage(){
+
+    let users = [] ;
+
+    if(sessionStorage.getItem("users")){
+
+        users = JSON.parse(sessionStorage.getItem("users"));
+    }
+
+    return users
+
+  }
+
+
+  //Listando todos os dados que tem na SessionStorage
+  selectAll(){
+      
+    let users = this.getUsersStorage()
+
+    users.forEach(dataUser=>{
+
+        let user = new User();
+
+        user.loadFromJSON(dataUser);
+
+        this.addLine(user);
+
+    })
+
+  }
+
+
+  //Criando uma função que salva na SessionStorage
+  insert(data){
+   
+    let users = this.getUsersStorage()
+
+    users.push(data);
+          
+    
+    sessionStorage.setItem("users", JSON.stringify(users));
+
+  }
+
+
+
   //Cria uma função que adiciona uma linha na tabela
   addLine(dataUser) {
-    let tr = document.createElement("tr");
+    
+    let tr = document.createElement("tr");   
+
 
     tr.dataset.user = JSON.stringify(dataUser);
 
@@ -275,5 +326,5 @@ class UserController {
   }
 
 
-  
+
 }
