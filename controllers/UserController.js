@@ -162,20 +162,11 @@ class UserController {
       user.admin
     );
   }
-
-  getUsersStorage() {
-    let users = [];
-
-    if (localStorage.getItem("users")) {
-      users = JSON.parse(localStorage.getItem("users"));
-    }
-
-    return users;
-  }
+  
 
   //Listando todos os dados que tem na SessionStorage
   selectAll() {
-    let users = this.getUsersStorage();
+    let users = User.getUsersStorage();
 
     users.forEach((dataUser) => {
       let user = new User();
@@ -232,7 +223,15 @@ class UserController {
   addEventsTr(tr) {
     tr.querySelector(".btn-delete").addEventListener("click", (e) => {
       if (confirm("Deseja realmente excluir ?")) {
+
+        let user =  new User();
+
+        user.loadFromJSON(JSON.parse(tr.dataset.user));
+
+        user.remove();
+
         tr.remove();
+        
         this.updateCount();
       }
     });
